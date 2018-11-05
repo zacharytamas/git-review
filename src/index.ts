@@ -1,43 +1,13 @@
-import { exec } from 'child_process';
-import { existsSync } from 'fs';
-import { platform } from 'os';
-import { promisify } from 'util';
+import simplegit from 'simple-git/promise';
+import { findGitRepositories } from './findGitRepositories';
 
-interface IFindGitRepositoriesOptions {
-  shallow?: boolean;
-  ignore?: string[];
-}
+findGitRepositories('/Users/zachary/Develop').then(async repos => {
+  repos.forEach(async path => {
+    const repo = simplegit(path);
+    const { files } = await repo.diffSummary();
 
-const findGitRepositories = async (
-  directory: string,
-  options: IFindGitRepositoriesOptions = {}
-): Promise<string[]> => {
-  const { shallow = true, ignore = ['*/node_modules/*'] } = options;
-
-  if (!existsSync(directory)) {
-    throw new Error(`Provided directory does not exist: ${directory}.`);
-  }
-
-  // Use platform-specific manners if possible for increased performance.
-  if (platform() === 'darwin') {
-    const { stdout, stderr } = await promisify(exec)(
-      `find ${directory} ${ignore
-        .map(ig => `-not \\( -path "${ig}" -prune \\)`)
-        .join(' ')} -name .git ${shallow ? '-prune' : ''}`
-    );
-
-    if (stderr) {
-      throw new Error(stderr);
+    if (files.length > 0) {
+      console.log(`${path} is dirty.`);
     }
-
-    return stdout.trimRight().split('\n');
-  }
-
-  const repoContainingFolders = [];
-
-  return repoContainingFolders;
-};
-
-findGitRepositories('/Users/zachary/Develop').then(repos => {
-  console.log(repos, repos.length);
+  });
 });
