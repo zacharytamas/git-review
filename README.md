@@ -1,5 +1,7 @@
 # git-review
 
+[![Greenkeeper badge](https://badges.greenkeeper.io/zacharytamas/git-review.svg)](https://greenkeeper.io/)
+
 > **Note:** This is presently under active development and may not yet be useful generally.
 
 This project aims to create an interactive CLI tool for reviewing git repositories on your local system and making it easy to do things such as:
